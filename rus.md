@@ -283,16 +283,19 @@ _(Примечание редактора: К сожалению, значени
       // ...
     }
 
-### Multiple return values
+### Возврат нескольких значений
 
-Although multiple return values aren’t baked into the language proper, they don’t need to be because you can return an array and destructure the result:
+В языке нет встроенной возможности возвращать из функции несколько значений, но
+она и не нужна, потому что вы можете возвращать массив и деструктурировать
+результат:
 
     function returnMultipleValues() {
       return [1, 2];
     }
     var [foo, bar] = returnMultipleValues();
 
-Alternatively, you can use an object as the container and name the returned values:
+Или же вы можете использовать объект в качестве контейнера и обращаться к
+возвращаемым значениям по именам:
 
     function returnMultipleValues() {
       return {
@@ -302,7 +305,7 @@ Alternatively, you can use an object as the container and name the returned valu
     }
     var { foo, bar } = returnMultipleValues();
 
-Both of these patterns end up much better than holding onto the temporary container:
+Оба эти подхода гораздо лучше, чем использование временной переменной:
 
     function returnMultipleValues() {
       return {
@@ -314,40 +317,63 @@ Both of these patterns end up much better than holding onto the temporary contai
     var foo = temp.foo;
     var bar = temp.bar;
 
-Or using continuation passing style:
+Или использование стиля передачи продолжений:
 
     function returnMultipleValues(k) {
       k(1, 2);
     }
     returnMultipleValues((foo, bar) => ...);
 
-### Importing names from a CommonJS module
+### Импортирование имён из модуля CommonJS
 
-Not using ES6 modules yet? Still using CommonJS modules? No problem! When importing some CommonJS module X, it is fairly common that module X exports more functions than you actually intend to use. With destructuring, you can be explicit about which parts of a given module you’d like to use and avoid cluttering your namespace:
+Ещё не пользуетесь модулями ES6? Всё ещё применяете модули CommonJS?
+Без проблем! При импорте какого-нибудь модуля X в формате CommonJS зачастую
+оказывается, что модуль X экспортирует больше функций, чем вы собираетесь
+использовать. С деструктурированием вы можете явно указать, какие части модуля
+вам хотелось бы использовать и избежать захламления пространства имён:
 
     const { SourceMapConsumer, SourceNode } = require("source-map");
 
-(And if you do use ES6 modules, you know that a similar syntax is available in `import` declarations.)
+(А если вы пользуетесь модулями ES6, вы уже знаете, что похожим синтаксисом
+можно пользоваться в декларациях `import`.)
 
-## Conclusion
+## Заключение
 
-So, as you can see, destructuring is useful in many individually small cases. At Mozilla we’ve had a lot of experience with it. Lars Hansen introduced JS destructuring in Opera ten years ago, and Brendan Eich added support to Firefox a bit later. It shipped in Firefox 2\. So we know that destructuring sneaks into your everyday use of the language, quietly making your code a bit shorter and cleaner all over the place.
+Итак, как вы видите, деструктурирование полезно во множестве мелких случаев.
+У нас в Mozilla в этом отношении большой опыт. Ларс Хансен (Lars Hansen)
+ввёл в JS деструктурирование в Opera десять лет назад, а чуть позже Брендан Айк
+(Brendan Eich) добавил поддержку в Firefox. Она была в Firefox 2. Так что мы
+знаем, как деструктурирование проникает в повседневное пользование языком, тихо
+делая везде код немного короче и чище.
 
-Five weeks ago, we said that ES6 would change the way you write JavaScript. It is this sort of feature we had particularly in mind: simple improvements that can be learned one at a time. Taken together, they will end up affecting every project you work on. Revolution by way of evolution.
+Пять недель назад мы сказали, что ES6 изменит то, как вы пишете на JavaScript.
+Именно такие возможности мы в особенности и имели в виду, простые улучшения,
+которым можно научиться за один раз. А будучи собранными вместе они повлияют на
+каждый проект, над которым вы работаете. Революция средствами эволюции.
 
-Updating destructuring to comply with ES6 has been a team effort. Special thanks to Tooru Fujisawa (arai) and Arpad Borsos (Swatinem) for their excellent contributions.
+Обновлением деструктурирования до совместимости с ES6 занималась вся команда.
+Особое спасибо Tooru Fujisawa (arai) и Arpad Borsos (Swatinem) за их выдающийся
+вклад.
 
-Support for destructuring is under development for Chrome, and other browsers will undoubtedly add support in time. For now, you’ll need to use [Babel][10] or [Traceur][11] if you want to use destructuring on the Web.
+Поддержка деструктурирования в процессе разработки в Chrome, и в других
+браузерах без всякого сомнения она тоже скоро будет. А пока что нужно
+использовать [Babel][10] или [Traceur][11], если вы хотите пользоваться
+деструктурированием в вебе.
 
 * * *
 
-_Thanks again to Nick Fitzgerald for this week’s post._
+_Ещё раз спасибо Нику Фицджеральду за статью этой недели._
 
-_Next week, we’ll cover a feature that is nothing more or less than a slightly shorter way to write something JS already has—something that has been one of the fundamental building blocks of the language all along. Will you care? Is slightly shorter syntax something you can get excited about? I confidently predict the answer is yes, but don’t take my word for it. Join us next week and find out, as we look at ES6 arrow functions in depth._
+_На следующей неделе мы рассмотрим возможность, которая ни больше ни меньше, чем
+более короткий способ записывать кое-что, что в JS уже есть. Что-то, что было
+одним из краеугольных камней языка всё это время. Заинтересовались? У вас можно
+вызвать восхищение слегка более коротким синтаксисом? Я могу с уверенностью
+сказать, что ответ будет «да», но не верьте мне на слово. Присоединяйтесь на
+следующей неделе и узнайте сами, мы рассмотрим стрелочные функции ES6 в деталях._
 
-_Jason Orendorff_
+_Джейсон Орендорфф (Jason Orendorff)_
 
-_[ES6 In Depth][1] editor_
+_Редактор [ES6 In Depth][1]_
 
  [1]: https://hacks.mozilla.org/category/es6-in-depth/
  [2]: http://fitzgeraldnick.com/
