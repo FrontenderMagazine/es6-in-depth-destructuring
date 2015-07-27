@@ -163,54 +163,75 @@ _Примечание редактора: Более ранняя версия �
     ({ safe } = {});
     // Нет ошибок
 
-## Destructuring values that are not an object, array, or iterable
+## Деструктурирование значений, не являющихся объектом, массивом или итерируемым
 
-When you try to use destructuring on `null` or `undefined`, you get a type error:
+Если вы попробуете деструктурировать `null` или `undefined`, вы получите ошибку
+о неподходящем типе:
 
     var {blowUp} = null;
-    // TypeError: null has no properties
+    // TypeError: у null нет свойств
 
-However, you can destructure on other primitive types such as booleans, numbers, and strings, and get `undefined`:
+Однако, вы можете деструктурировать другие примитивные типы, такие как булевы
+значения, числа или строки, и вы получите `undefined`:
 
     var {wtf} = NaN;
     console.log(wtf);
     // undefined
 
-This may come unexpected, but upon further examination the reason turns out to be simple. When using an object assignment pattern, the value being destructured is [required to be coercible to an `Object`][5]. Most types can be converted to an object, but `null` and `undefined` may not be converted. When using an array assignment pattern, the value must [have an iterator][6].
+Такое поведение может показаться неожиданным, но после дальнейшего изучения
+причина окажется простой. При использовании шаблона деструктурирования,
+деструктурируемое значение [должно приводиться к объекту][5]. Большинство типов
+могут быть преобразованы в объект, но `null` и `undefined` преобразовать нельзя.
+Если вы используете шаблон массива для присваивания, то значение должно
+[иметь итератор][6].
 
-## Default values
+## Значения по умолчанию
 
-You can also provide default values for when the property you are destructuring is not defined:
+Вы также можете указать значения по умолчанию на случай, если при свойство,
+которое вы хотите деструктурировать, не определено:
 
     var [missing = true] = [];
     console.log(missing);
     // true
 
-    var { message: msg = "Something went wrong" } = {};
+    var { message: msg = "Что-то пошло не так" } = {};
     console.log(msg);
-    // "Something went wrong"
+    // "Что-то пошло не так"
 
     var { x = 3 } = {};
     console.log(x);
     // 3
 
-_(Editor’s note: This feature is currently implemented in Firefox only for the first two cases, not the third. See [bug 932080][7].)_
+_(Примечание редактора: Эта функциональность реализована в Firefox только для
+первых двух примеров, но не для третьего. См. [баг 932080][7].)_
 
-## Practical applications of destructuring
+## Прикладное применение деструктурирования
 
-### Function parameter definitions
+### Определения параметров функций
 
-As developers, we can often expose more ergonomic APIs by accepting a single object with multiple properties as a parameter instead of forcing our API consumers to remember the order of many individual parameters. We can use destructuring to avoid repeating this single parameter object whenever we want to reference one of its properties:
+Как разработчики мы часто предоставляем более эргономичное API, принимая в
+качестве параметра единственный объект с несколькими свойствами вместо того,
+чтобы заставлять пользователей нашего API запоминать порядок отдельных
+параметров. Мы можем воспользоваться деструктурированием чтобы избежать
+повторения этого объекта-параметра всякий раз, как мы хотим обратиться к его
+свойству:
 
     function removeBreakpoint({ url, line, column }) {
       // ...
     }
 
-This is a simplified snippet of real world code from the Firefox DevTools JavaScript debugger (which is also implemented in JavaScript—yo dawg). We have found this pattern particularly pleasing.
+Это упрощенный пример настоящего, работающего кода из отладчика javaScript в
+Firefox DevTools (который в свою очередь сам написан JavaScript. Yo Dawg!)
+Нам кажется, что такой подход особенно удобен.
 
-### Configuration object parameters
+### Параметры с объектами-конфигурациями
 
-Expanding on the previous example, we can also give default values to the properties of the objects we are destructuring. This is particularly helpful when we have an object that is meant to provide configuration and many of the object’s properties already have sensible defaults. For example, jQuery’s `ajax` function takes a configuration object as its second parameter, and could be rewritten like this:
+Дополняя предыдущий пример, мы также можем задать значения по умолчанию для
+свойств деструктурируемых объектов. Это особенно полезно, если у нас есть
+объект, представляющий из себя конфигурацию, и для многих из свойств этого
+объекта уже есть разумные значения по умолчанию. К примеру, функция `ajax` из
+jQuery принимает объект-конфигурацию в качестве второго параметра, и её можно
+было бы переписать так:
 
     jQuery.ajax = function (url, {
       async = true,
@@ -219,36 +240,44 @@ Expanding on the previous example, we can also give default values to the proper
       complete = noop,
       crossDomain = false,
       global = true,
-      // ... more config
+      // ... больше настроек
     }) {
-      // ... do stuff
+      // ... делаем что-то полезное
     };
 
-This avoids repeating `var foo = config.foo || theDefaultFoo;` for each property of the configuration object.
+Это позволяет избежать повторения `var foo = config.foo || theDefaultFoo;` для
+каждого свойства объекта-конфигурации в отдельности.
 
-_(Editor’s note: Unfortunately, default values within object shorthand syntax still aren’t implemented in Firefox. I know, we’ve had several paragraphs to work on it since that earlier note. See [bug 932080][7] for the latest updates.)_
+_(Примечание редактора: К сожалению, значения по умолчанию внутри краткой записи
+свойств объектов не реализованы в Firefox. Я знаю, у нас было несколько абзацев
+с предыдущего примечания, чтобы поработать над этим. Смотрите [баг 932080][7],
+чтобы узнать о последних новостях.)_
 
-### With the ES6 iteration protocol
+### Использование с протоколом итераторов из ES6
 
-[ECMAScript 6 also defines an iteration protocol][8], which we talked about earlier in this series. When you iterate over [`Map`s (an ES6 addition to the standard library)][9], you get a series of `[key, value]` pairs. We can destructure this pair to get easy access to both the key and the value:
+[ECMAScript 6 также определяет протокол для работы с итераторами][8], о котором
+мы уже говорили ранее в этом цикле статей. Когда вы итерируете
+[`Map` (дополнение ES6 к стандартной библиотеке)][9], вы получаете набор пар
+`[ключ, значение]`. Можно деструктурировать эти пары, чтобы удобнее работать как
+с ключом, так и со значением:
 
     var map = new Map();
-    map.set(window, "the global");
-    map.set(document, "the document");
+    map.set(window, "глобальный объект");
+    map.set(document, "документ");
 
     for (var [key, value] of map) {
-      console.log(key + " is " + value);
+      console.log(key + " — это " + value);
     }
-    // "[object Window] is the global"
-    // "[object HTMLDocument] is the document"
+    // "[object Window] — это глобальный объект"
+    // "[object HTMLDocument] — это документ"
 
-Iterate over only the keys:
+Перебираем только ключи:
 
     for (var [key] of map) {
       // ...
     }
 
-Or iterate over only the values:
+Или перебираем только значения:
 
     for (var [,value] of map) {
       // ...
